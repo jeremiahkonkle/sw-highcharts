@@ -18,33 +18,37 @@ class SWMap
   
   attach: ($el) ->
     this.chart = $el.highcharts 'Map', this.opts
-    console.log this.chart
   
   _handle_drilldown: (e) ->
-    # I believe seriesOptions is set if we have already loaded the map data
     chart = e.currentTarget
     
+    # I believe seriesOptions is set if we have already loaded the map data
     if !e.seriesOptions
-      mapKey = 'countries/us/' + e.point.properties['hc-key'] + '-all'
+      map_key = this._map_key_from_point e.point
       
-      if !Highcharts.maps[mapKey]
-        mdata_url = 'http://code.highcharts.com/mapdata/' + mapKey + '.js'
-        $.getScript mdata_url
+      if !Highcharts.maps[map_key]
+        # Font Awesome spinner
+        chart.showLoading('<i class="icon-spinner icon-spin icon-3x"></i>'); 
+        
+        $.getScript this._map_data_url(map_key)
           .done =>
-            this._do_drilldown chart, e.point, mapKey
+            this._do_drilldown chart, e.point, map_key
+            chart.hideLoading();
           .fail =>
-            alert('failed to get map data.')
+            console.log('failed to get map data.')
+            chart.hideLoading()
         
       else
-        this._do_drilldown chart, e.point, mapKey
+        this._do_drilldown chart, e.point, map_key
   
-  _do_drilldown: (chart, point, mapKey) ->
-      data = Highcharts.geojson(Highcharts.maps[mapKey]);
+  _do_drilldown: (chart, point, map_key) ->
+      data = Highcharts.geojson(Highcharts.maps[map_key]);
 
       #Set a non-random bogus value
       for p, i in data
         p.value = i+1
-
+        p.drilldown = this._point_can_drilldown(p)
+      
       #Hide loading and add series
       chart.addSeriesAsDrilldown(point, {
           name: point.name,
@@ -54,6 +58,39 @@ class SWMap
               format: '{point.name}'
           }
       });
+  
+  _map_key_from_point: (point) ->
+    hc_key = point.properties['hc-key']
+    parts = hc_key.split('-')
+    
+    if not parts.length
+      return undefined
+    
+    country = parts[0];
+    
+    ans = "countries/#{country}/#{hc_key}-all"
+    return ans
+  
+  _map_data_url: (map_key) ->
+    return 'http://code.highcharts.com/mapdata/' + map_key + '.js'
+  
+  _point_can_drilldown: (point) ->
+    hc_key = point.properties['hc-key']
+    parts = hc_key.split('-')
+    
+    if not parts.length
+      # invalid key
+      return false
+    
+    if parts.length == 1
+      # assume all country level keys can drill
+      return true
+    
+    if parts.length == 2 && parts[0] == 'us'
+      # all US states can drill
+      return true
+    
+    return false
   
   _handle_drillup: (e) ->
     console.log 'drill up'

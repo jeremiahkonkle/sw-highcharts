@@ -69,6 +69,14 @@ gulp.task('watch-static', ['copy-static'], function() {
 });
 
 
+gulp.task('deploy', function () {
+    var deploy = require("gulp-gh-pages");
+    options = {
+    };
+    gulp.src(build_dir+"/**/*")
+        .pipe(deploy(options));
+});
+
 gulp.task('mocha', function() {
   var mocha = require('gulp-mocha');
   

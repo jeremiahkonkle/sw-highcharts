@@ -23,7 +23,8 @@
     "connect": "~2.25.5",
     "gulp": "~3.8.7",
     "watchify": "~0.10.2",
-    "coffeeify": "~0.7.0"
+    "coffeeify": "~0.7.0",
+    "gulp-gh-pages": "~0.3.3"
   },
   "browserify": {
     "transform": [

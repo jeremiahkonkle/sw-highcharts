@@ -7,7 +7,7 @@ module.exports =
         drillup: null
 
   title:
-      text : 'Waiverites'
+      text : 'Waivers'
 
   legend:
       layout: 'vertical',
@@ -16,8 +16,7 @@ module.exports =
       floating: false,
       verticalAlign: 'middle',
       align: 'left',
-      y: 50,
-      
+      y: 50
 
   mapNavigation:
       enabled: true
@@ -53,11 +52,11 @@ module.exports =
       dataLabels: {
           enabled: true,
           color: 'white',
-          format: '{point.code}'
+          format: '{point.name}'
       },
-      name: 'US',
+      name: 'World',
       tooltip: {
-          pointFormat: '{point.code}: {point.value}/km²'
+          pointFormat: '{point.name}: {point.value}/km²'
       }
   ]
   
